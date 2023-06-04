@@ -54,8 +54,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'certbot-dns-zoneedit'
-copyright = u'2017, Certbot Project'
-author = u'Certbot Project'
+copyright = u'2023, Ziemowit Łąski'
+author = u'Ziemowit Łąski'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
