@@ -7,7 +7,9 @@ from setuptools import setup
 version = '0.9.0'
 
 install_requires = [
-    'setuptools>=41.6.0',
+    "setuptools>=41.6.0",
+    "acme>=2.6.0",
+    "certbot>=2.6.0"
 ]
 
 if not os.environ.get('SNAP_BUILD'):
