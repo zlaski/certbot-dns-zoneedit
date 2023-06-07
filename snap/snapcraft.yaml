@@ -1,0 +1,46 @@
+name: certbot-dns-porkbun
+summary: ZoneEdit DNS Authenticator plugin for Certbot
+description: ZoneEdit DNS Authenticator plugin for Certbot
+confinement: strict
+grade: devel
+base: core20
+adopt-info: certbot-dns-zoneedit
+
+parts:
+  certbot-dns-zoneedit:
+    plugin: python
+    source: .
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version `grep ^__version__ $SNAPCRAFT_PART_SRC/certbot_dns_zoneedit/__init__.py | cut -f2 -d= | tr -d "\"[:space:]\""`
+    build-environment:
+      - SNAP_BUILD: "True"
+    requirements:
+      - requirements.txt
+    build-packages:
+      - gcc
+      - git
+      - build-essential
+      - libssl-dev
+      - libffi-dev
+      - python3-dev
+  certbot-metadata:
+    plugin: dump
+    source: .
+    stage: [ setup.py, certbot-shared ]
+    override-pull: |
+      snapcraftctl pull
+      mkdir -p $SNAPCRAFT_PART_SRC/certbot-shared
+
+slots:
+  certbot:
+    interface: content
+    content: certbot-1
+    read:
+      - $SNAP/lib/python3.8/site-packages
+
+plugs:
+  certbot-metadata:
+    interface: content
+    content: metadata-1
+    target: $SNAP/certbot-shared
