@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "certbot-dns-zoneedit"
+version = "0.3.2"
+description = "A Certbot plugin that implements LetsEncrypt DNS-01 challenge via ZoneEdit"
+authors = ["Ziemowit Łąski <zlaski@ziemas.net>"]
+license = "Apache-2.0"
+readme = "README.rst"
+repository = "https://github.com/zlaski/certbot-dns-zoneedit"
+
+packages = [{include = "certbot_dns_zoneedit.py"}]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Plugins",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Security",
+    "Topic :: System :: Installation/Setup",
+    "Topic :: System :: Networking",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.6,<4.0"
+acme = ">=0.31.0"
+certbot = ">=0.31.0"
+requests = ">=2.31.0"
+logging = ">=0.5.1.2"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins."certbot.plugins"]
+"dns-zoneedit" = "certbot_dns_zoneedit:Authenticator"

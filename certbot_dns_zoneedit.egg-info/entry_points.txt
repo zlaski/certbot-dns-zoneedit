@@ -1,3 +1,0 @@
-[certbot.plugins]
-dns-zoneedit = certbot_dns_zoneedit._internal.dns_zoneedit:Authenticator
-
