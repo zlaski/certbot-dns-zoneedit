@@ -3,6 +3,8 @@ MANIFEST.in
 PKG-INFO
 README.rst
 readthedocs.org.requirements.txt
+requirements.txt
+setup.cfg
 setup.py
 certbot_dns_zoneedit/py.typed
 certbot_dns_zoneedit/__init__.py

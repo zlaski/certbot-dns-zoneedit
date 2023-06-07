@@ -58,6 +58,8 @@ class Authenticator(dns_common.DNSAuthenticator):
         )
         self.zoneedit_user = self.credentials.conf("dns_zoneedit_user")
         self.zoneedit_token = self.credentials.conf("dns_zoneedit_token")
+        logger.debug("self.zoneedit_user=%s", self.zoneedit_user)
+        logger.debug("self.zoneedit_token=%s", self.zoneedit_token)
 
        
     def _perform(self, _domain: str, validation_name: str, validation: str) -> None:
@@ -92,6 +94,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         
         r = requests.get(url, params=payload, auth=credentials)
         logger.debug("Returned code %d", p.status_code);
+        logger.debug("\n%s", p.text);
         r.raise_for_status()
         
 
