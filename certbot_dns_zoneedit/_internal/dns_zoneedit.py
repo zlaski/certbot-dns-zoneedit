@@ -16,7 +16,7 @@ import requests
 import logging
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 class Authenticator(dns_common.DNSAuthenticator):
 
@@ -61,7 +61,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         logger.debug("self.zoneedit_user=%s", self.zoneedit_user)
         logger.debug("self.zoneedit_token=%s", self.zoneedit_token)
 
-       
+
     def _perform(self, _domain: str, validation_name: str, validation: str) -> None:
         """
         Performs a dns-01 challenge by creating a DNS TXT record.
@@ -85,18 +85,18 @@ class Authenticator(dns_common.DNSAuthenticator):
         """
         self._fetch_url("txt-delete", _domain, validation_name, validation)
 
-    def _fetch_url(verb: str, domain_name: str, record_name: str, record_content: str)
+    def _fetch_url(verb: str, domain_name: str, record_name: str, record_content: str):
         url = "https://dynamic.zoneedit.com/" + verb + ".php"
         payload = { 'host': domain_name, 'rdata': record_content }
         credentials = ( self.zoneedit_user, self.zoneedit_token )
 
         logger.debug("Getting %s [%s %s %s]", url, domain_name, record_name, record_content);
-        
+
         r = requests.get(url, params=payload, auth=credentials)
         logger.debug("Returned code %d", p.status_code);
         logger.debug("\n%s", p.text);
         r.raise_for_status()
-        
+
 
     def _find_domain(self, record_name: str) -> str:
         """

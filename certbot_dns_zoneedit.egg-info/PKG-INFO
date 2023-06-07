@@ -6,6 +6,8 @@ Home-page: https://github.com/zlaski/certbot-dns-zoneedit
 Author: Ziemowit Łąski
 Author-email: zlaski@ziemas.net
 License: Apache License 2.0
+Description: UNKNOWN
+Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: Plugins
 Classifier: Intended Audience :: System Administrators
@@ -27,4 +29,3 @@ Classifier: Topic :: Utilities
 Requires-Python: >=3.7
 Provides-Extra: docs
 Provides-Extra: test
-License-File: LICENSE.txt
