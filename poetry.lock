@@ -137,30 +137,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "dns-lexicon"
-version = "3.6.0"
-description = "Manipulate DNS records on various DNS providers in a standardized/agnostic way"
-category = "main"
-optional = false
-python-versions = ">=3.6,<4.0"
-
-[package.dependencies]
-beautifulsoup4 = ">=4,<5"
-cryptography = ">=2,<4"
-pyyaml = ">=3,<6"
-requests = ">=2,<3"
-tldextract = ">=2,<4"
-
-[package.extras]
-route53 = ["boto3 (>=1,<2)"]
-full = ["boto3 (>=1,<2)", "localzone (>=0.9.8,<1)", "softlayer (>=5,<6)", "transip (>=2,<3)", "zeep (>=3,<5)"]
-ddns = ["dnspython (>=2,<3)"]
-localzone = ["localzone (>=0.9.8,<1)"]
-softlayer = ["softlayer (>=5,<6)"]
-transip = ["transip (>=2,<3)"]
-gransy = ["zeep (>=3,<5)"]
-
-[[package]]
 name = "filelock"
 version = "3.0.12"
 description = "A platform independent file lock."
@@ -520,10 +496,6 @@ cryptography = [
 distro = [
     {file = "distro-1.5.0-py2.py3-none-any.whl", hash = "sha256:df74eed763e18d10d0da624258524ae80486432cd17392d9c3d96f5e83cd2799"},
     {file = "distro-1.5.0.tar.gz", hash = "sha256:0e58756ae38fbd8fc3020d54badb8eae17c5b9dcbed388b17bb55b8a5928df92"},
-]
-dns-lexicon = [
-    {file = "dns-lexicon-3.6.0.tar.gz", hash = "sha256:3f76eb266381dabee6e1c594d3a52700bd66811648328e0090a67a807cb68fd9"},
-    {file = "dns_lexicon-3.6.0-py3-none-any.whl", hash = "sha256:234302261eb2fccabcbd7aa55654d50ce10359c233b5fede6d088cae52635705"},
 ]
 filelock = [
     {file = "filelock-3.0.12-py3-none-any.whl", hash = "sha256:929b7d63ec5b7d6b71b0fa5ac14e030b3f70b75747cef1b10da9b879fef15836"},

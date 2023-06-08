@@ -5,11 +5,8 @@ As of 6 June 2023, the following API is available:
 https://$dns_zoneedit_user:$dns_zoneedit_token@dynamic.zoneedit.com/txt-create.php?host=_acme-challenge.$domain_name&rdata=$dns01_challenge
 https://$dns_zoneedit_user:$dns_zoneedit_token@dynamic.zoneedit.com/txt-delete.php?host=_acme-challenge.$domain_name&rdata=$dns01_challenge
 
-The GET requests return information such as the following:
-
-<ERROR CODE="708" TEXT="Login Failed: $dns_zoneedit_user" ZONE="_acme-challenge.$domain">
-
 """
+
 from certbot import errors, interfaces
 from certbot.plugins import common, dns_common
 import requests
@@ -36,7 +33,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         add(
             "credentials",
             help="ZoneEdit credentials INI file.",
-            default="/etc/letsencrypt/zeneedit.ini",
+            default="/etc/letsencrypt/zoneedit.ini",
         )
 
 
@@ -52,12 +49,12 @@ class Authenticator(dns_common.DNSAuthenticator):
             "credentials",
             "ZoneEdit credentials INI file",
             {
-                "dns_zoneedit_user": "User ID of the owner of the DNS zone.",
-                "dns_zoneedit_token": "ZoneEdit-generated token for the DNS zone.",
+                "user": "User ID of the owner of the DNS zone.",
+                "token": "ZoneEdit-generated token for the DNS zone.",
             },
         )
-        self.zoneedit_user = self.credentials.conf("dns_zoneedit_user")
-        self.zoneedit_token = self.credentials.conf("dns_zoneedit_token")
+        self.zoneedit_user = self.credentials.conf("user")
+        self.zoneedit_token = self.credentials.conf("token")
         logger.debug("self.zoneedit_user=%s", self.zoneedit_user)
         logger.debug("self.zoneedit_token=%s", self.zoneedit_token)
 
@@ -71,7 +68,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         :param str validation: The validation record content.
         :raises errors.PluginError: If the challenge cannot be performed
         """
-        self._fetch_urlt("txt-create", _domain, validation_name, validation)
+        self._fetch_url("txt-create", _domain, validation_name, validation)
 
 
     def _cleanup(self, _domain: str, validation_name: str, validation: str) -> None:
@@ -85,16 +82,18 @@ class Authenticator(dns_common.DNSAuthenticator):
         """
         self._fetch_url("txt-delete", _domain, validation_name, validation)
 
-    def _fetch_url(verb: str, domain_name: str, record_name: str, record_content: str):
+    def _fetch_url(self, verb: str, domain_name: str, record_name: str, record_content: str):
         url = "https://dynamic.zoneedit.com/" + verb + ".php"
-        payload = { 'host': domain_name, 'rdata': record_content }
+        payload = { 'host': record_name, 'rdata': record_content }
         credentials = ( self.zoneedit_user, self.zoneedit_token )
 
         logger.debug("Getting %s [%s %s %s]", url, domain_name, record_name, record_content);
+        logger.debug("Payload: %s", payload);
+        logger.debug("Credentials: %s", credentials);
 
         r = requests.get(url, params=payload, auth=credentials)
-        logger.debug("Returned code %d", p.status_code);
-        logger.debug("\n%s", p.text);
+        logger.debug("Returned code %d", r.status_code);
+        logger.debug("\n%s", r.text);
         r.raise_for_status()
 
 

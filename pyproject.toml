@@ -34,7 +34,7 @@ python = ">=3.6,<4.0"
 acme = ">=0.31.0"
 certbot = ">=0.31.0"
 requests = ">=2.31.0"
-logging = ">=0.5.1.2"
+logging = ">=0.4.9"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.8.0"
