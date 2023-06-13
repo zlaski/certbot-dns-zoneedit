@@ -1,1 +1,0 @@
-"""certbot-dns-zoneedit tests"""
