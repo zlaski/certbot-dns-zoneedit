@@ -5,3 +5,5 @@ dist
 work
 yarn.lock
 node_modules
+__pycache__/
+
