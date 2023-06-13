@@ -1,19 +1,18 @@
-""" Certbot ZoneEdit DNS-01 auth plugin.
-
-As of 6 June 2023, the following API is available:
-
-https://$dns_zoneedit_user:$dns_zoneedit_token@dynamic.zoneedit.com/txt-create.php?host=_acme-challenge.$domain_name&rdata=$dns01_challenge
-https://$dns_zoneedit_user:$dns_zoneedit_token@dynamic.zoneedit.com/txt-delete.php?host=_acme-challenge.$domain_name&rdata=$dns01_challenge
-
-"""
+""" Certbot ZoneEdit DNS-01 auth plugin. """
 
 from certbot import errors, interfaces
 from certbot.plugins import common, dns_common
 import requests
 import logging
+import dns.resolver
+import json
+import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+CREATE_URL = "https://dynamic.zoneedit.com/txt-create.php"
+DELETE_URL = "https://dynamic.zoneedit.com/txt-delete.php"
 
 class Authenticator(dns_common.DNSAuthenticator):
 
@@ -21,6 +20,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
 
     def __init__(self, *args, **kwargs):
+        logger.debug("__init__: %s", self)
         super(Authenticator, self).__init__(*args, **kwargs)
         self.credentials = None
 
@@ -57,9 +57,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         self.zoneedit_token = self.credentials.conf("token")
         logger.debug("self.zoneedit_user=%s", self.zoneedit_user)
         logger.debug("self.zoneedit_token=%s", self.zoneedit_token)
+        self.zoneedit_login = ( self.zoneedit_user, self.zoneedit_token )
 
 
-    def _perform(self, _domain: str, validation_name: str, validation: str) -> None:
+    def _perform(self, domain: str, validation_domain_name: str, validation: str) -> None:
         """
         Performs a dns-01 challenge by creating a DNS TXT record.
 
@@ -68,54 +69,38 @@ class Authenticator(dns_common.DNSAuthenticator):
         :param str validation: The validation record content.
         :raises errors.PluginError: If the challenge cannot be performed
         """
-        self._fetch_url("txt-create", _domain, validation_name, validation)
+
+        self._cleanup(domain, validation_domain_name, validation)
+
+        logger.debug("_perform: %s", validation_domain_name)
+
+        payload = { 'host': validation_domain_name, 'rdata': validation }
+        r = requests.get(CREATE_URL, params=payload, auth=self.zoneedit_login)
+
+        logger.debug(r.text)
+        time.sleep(10)
+        r.raise_for_status()
 
 
-    def _cleanup(self, _domain: str, validation_name: str, validation: str) -> None:
+    def _cleanup(self, domain: str, validation_domain_name: str, validation: str) -> None:
         """
-        Deletes the DNS TXT record previously created by _perform().
+        Deletes the DNS TXT record(s) previously created by _perform().
         Fails gracefully if no such record exists.
 
         :param str domain: The domain being validated.
         :param str validation_domain_name: The validation record domain name.
         :param str validation: The validation record content.
         """
-        self._fetch_url("txt-delete", _domain, validation_name, validation)
 
-    def _fetch_url(self, verb: str, domain_name: str, record_name: str, record_content: str):
-        url = "https://dynamic.zoneedit.com/" + verb + ".php"
-        payload = { 'host': record_name, 'rdata': record_content }
-        credentials = ( self.zoneedit_user, self.zoneedit_token )
+        logger.debug("_cleanup: %s", validation_domain_name)
 
-        logger.debug("Getting %s [%s %s %s]", url, domain_name, record_name, record_content);
-        logger.debug("Payload: %s", payload);
-        logger.debug("Credentials: %s", credentials);
+        answers = dns.resolver.query(validation_domain_name, 'TXT', raise_on_no_answer = False)
+        logger.debug(answers.response)
 
-        r = requests.get(url, params=payload, auth=credentials)
-        logger.debug("Returned code %d", r.status_code);
-        logger.debug("\n%s", r.text);
-        r.raise_for_status()
+        for rdata in answers:
+            for rdataval in rdata.strings:
+                payload = { 'host': validation_domain_name, 'rdata': rdataval }
+                r = requests.get(DELETE_URL, params=payload, auth=self.zoneedit_login)
 
-
-    def _find_domain(self, record_name: str) -> str:
-        """
-        Find the closest domain with an SOA record for a given domain name.
-
-        :param str record_name: The record name for which to find the closest SOA record.
-        :returns: The domain, if found.
-        :rtype: str
-        :raises certbot.errors.PluginError: if no SOA record can be found.
-        """
-
-        logger.debug("Guessing domain for %s", record_name);
-        domain_name_guesses = dns_common.base_domain_name_guesses(record_name)
-
-        # Loop through until we find an authoritative SOA record
-        for guess in domain_name_guesses:
-            if self._query_soa(guess):
-                logger.debug("Guessed %s", guess);
-                return guess
-
-        raise errors.PluginError('Unable to determine base domain for {0} using names: {1}.'
-                                 .format(record_name, domain_name_guesses))
-
+                logger.debug(r.text)
+                time.sleep(10)
