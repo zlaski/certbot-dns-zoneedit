@@ -1,6 +1,5 @@
 .idea
 dist
-*.ini
 *.log*
 work
 yarn.lock
