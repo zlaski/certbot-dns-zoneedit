@@ -7,7 +7,10 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/zlaski/certbot-dns-zoneedit"
 
-packages = [{include = "certbot_dns_zoneedit.py"}]
+packages = [
+    {include = "certbot_dns_zoneedit.py"},
+    {include = "zoneedit.ini"},
+]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -17,7 +20,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -30,11 +32,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4.0"
+python = ">=3.7,<4.0"
 acme = ">=0.31.0"
 certbot = ">=0.31.0"
 requests = ">=2.31.0"
 logging = ">=0.4.9"
+dnspython = ">=2.3.0"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.8.0"
