@@ -9,7 +9,6 @@ import json
 import time
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 CREATE_URL = "https://dynamic.zoneedit.com/txt-create.php"
 DELETE_URL = "https://dynamic.zoneedit.com/txt-delete.php"
