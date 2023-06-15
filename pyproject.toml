@@ -7,7 +7,10 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/zlaski/certbot-dns-zoneedit"
 
-packages = [{include = "certbot_dns_zoneedit.py"}]
+packages = [
+    {include = "certbot_dns_zoneedit.py"},
+    {include = "zoneedit.ini"},
+]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
