@@ -10,8 +10,11 @@ import time
 
 logger = logging.getLogger(__name__)
 
-CREATE_URL = "https://dynamic.zoneedit.com/txt-create.php"
-DELETE_URL = "https://dynamic.zoneedit.com/txt-delete.php"
+IP_LOOKUP_URL = "https://dynamic.zoneedit.com/checkip.html"
+IP_DYNDNS_URL = "https://USER:AUTHTOKEN@dynamic.zoneedit.com/auth/dynamic.html?host=DOMAIN&dnsto=IPADDRESS"
+
+CREATE_CHALLENGE_URL = "https://USER:AUTHTOKEN@dynamic.zoneedit.com/txt-create.php?host=DOMAIN&rdata=CHALLENGE"
+DELETE_CHALLENGE_URL = "https://USER:AUTHTOKEN@dynamic.zoneedit.com/txt-delete.php?host=DOMAIN&rdata=CHALLENGE"
 
 class Authenticator(dns_common.DNSAuthenticator):
 
@@ -52,12 +55,8 @@ class Authenticator(dns_common.DNSAuthenticator):
                 "token": "ZoneEdit-generated token for the DNS zone.",
             },
         )
-        self.zoneedit_user = self.credentials.conf("user")
-        self.zoneedit_token = self.credentials.conf("token")
-        logger.debug("self.zoneedit_user=%s", self.zoneedit_user)
-        logger.debug("self.zoneedit_token=%s", self.zoneedit_token)
-        self.zoneedit_login = ( self.zoneedit_user, self.zoneedit_token )
-
+        self.zoneedit_login = ( self.credentials.conf("user"), self.credentials.conf("token") )
+        logger.debug("credentials: %s", self.zoneedit_login)
 
     def _perform(self, domain: str, validation_domain_name: str, validation: str) -> None:
         """
@@ -69,12 +68,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         :raises errors.PluginError: If the challenge cannot be performed
         """
 
-        self._cleanup(domain, validation_domain_name, validation)
-
         logger.debug("_perform: %s", validation_domain_name)
 
         payload = { 'host': validation_domain_name, 'rdata': validation }
-        r = requests.get(CREATE_URL, params=payload, auth=self.zoneedit_login)
+        r = requests.get(CREATE_CHALLENGE_URL, params=payload, auth=self.zoneedit_login)
 
         logger.debug(r.text)
         time.sleep(10)
@@ -83,7 +80,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _cleanup(self, domain: str, validation_domain_name: str, validation: str) -> None:
         """
-        Deletes the DNS TXT record(s) previously created by _perform().
+        Deletes one of the DNS TXT records previously created by _perform().
         Fails gracefully if no such record exists.
 
         :param str domain: The domain being validated.
@@ -93,13 +90,8 @@ class Authenticator(dns_common.DNSAuthenticator):
 
         logger.debug("_cleanup: %s", validation_domain_name)
 
-        answers = dns.resolver.query(validation_domain_name, 'TXT', raise_on_no_answer = False)
-        logger.debug(answers.response)
+        payload = { 'host': validation_domain_name, 'rdata': validation }
+        r = requests.get(DELETE_CHALLENGE_URL, params=payload, auth=self.zoneedit_login)
 
-        for rdata in answers:
-            for rdataval in rdata.strings:
-                payload = { 'host': validation_domain_name, 'rdata': rdataval }
-                r = requests.get(DELETE_URL, params=payload, auth=self.zoneedit_login)
-
-                logger.debug(r.text)
-                time.sleep(10)
+        logger.debug(r.text)
+        time.sleep(10)
