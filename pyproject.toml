@@ -36,7 +36,6 @@ python = ">=3.7,<4.0"
 acme = ">=2.4.0"
 certbot = ">=2.4.0"
 requests = ">=2.31.0"
-logging = ">=0.4.9"
 dnspython = ">=2.3.0"
 
 [tool.poetry.dev-dependencies]
