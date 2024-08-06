@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "certbot-dns-zoneedit"
-version = "0.3.2"
+version = "0.3.3"
 description = "A Certbot plugin that implements LetsEncrypt DNS-01 challenge via ZoneEdit"
 authors = ["Ziemowit Łąski <zlaski@ziemas.net>"]
 license = "Apache-2.0"
