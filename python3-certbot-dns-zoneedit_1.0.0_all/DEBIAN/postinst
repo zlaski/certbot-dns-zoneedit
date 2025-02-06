@@ -1,0 +1,48 @@
+#!/bin/sh
+# see: dh_installdeb(1)
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see https://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+set -e
+
+CONFIGFILE=/etc/letsencrypt/zoneedit.ini
+
+case "$1" in
+    configure)
+        if [ ! -e $CONFIGFILE ]; then
+            cp -p $CONFIGFILE.defaults $CONFIGFILE
+            # Message to user
+            echo "Set your ZoneEdit credentials into '$CONFIGFILE'."
+        fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# Set permissions on zoneedit.ini file containing credentials
+chmod 0600 $CONFIGFILE
+chown root:root $CONFIGFILE
+
+# Automatically added by dh_python3
+if command -v py3compile >/dev/null 2>&1; then
+	py3compile -p python3-certbot-dns-zoneedit
+fi
+if command -v pypy3compile >/dev/null 2>&1; then
+	pypy3compile -p python3-certbot-dns-zoneedit  || true
+fi
+
+# End automatically added section
